@@ -149,7 +149,7 @@ def transcribe_audio(file_path, model_name="medium"):
         download_model(model_name)
         
         # Load the Whisper model from the current directory
-        model = whisper.load_model(f"{model_name}.pt")
+        model = whisper.load_model(f"{model_name}.pt", weights_only=True)
         
         # Transcribe audio using Whisper
         result = model.transcribe(file_path, language='ar')
