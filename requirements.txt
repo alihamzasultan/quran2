@@ -1,0 +1,7 @@
+streamlit
+openai-whisper
+arabic-reshaper
+torch
+python-Levenshtein
+python-bidi
+python-ffmpeg
