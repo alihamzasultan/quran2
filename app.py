@@ -118,11 +118,14 @@ def correct_transcription(transcribed_text):
     corrected_text = " ".join(corrected_words)
 
     return corrected_text
-def transcribe_audio(file_path):
+def transcribe_audio(file_path, model_name="medium"):
     """Transcribes the given audio file and returns the transcribed text using OpenAI Whisper."""
     try:
-        # Load the Whisper model (you can choose "base", "small", "medium", "large")
-        model = whisper.load_model("medium")  
+        # Since the model is in the current directory, no need to specify a separate models folder
+        model_path = f"{model_name}.pt"
+
+        # Load the Whisper model from the current directory
+        model = whisper.load_model(model_path)
         
         # Transcribe audio using Whisper
         result = model.transcribe(file_path, language='ar')
