@@ -5,3 +5,4 @@ torch
 python-Levenshtein
 python-bidi
 python-ffmpeg
+gdown
