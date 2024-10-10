@@ -52,7 +52,9 @@ COMMON_ERRORS = {
     "إن":" ان",
     "عنها":"وانحر",
     "شانعك":"شانئك",
-    "الكوسر":"الكوثر"
+    "الكوسر":"الكوثر",
+    "ونهر":" وانحر",
+    " الأبثر":" الابتر"
     
 }
 
@@ -118,14 +120,36 @@ def correct_transcription(transcribed_text):
     corrected_text = " ".join(corrected_words)
 
     return corrected_text
+
+
+import whisper
+import os
+
+
+import os
+import gdown
+
+def download_model(model_name="medium"):
+    """Download the Whisper model from Google Drive if it's not already downloaded."""
+    model_file = f"{model_name}.pt"
+    
+    # Check if the model file already exists
+    if not os.path.exists(model_file):
+        print("Downloading the model...")
+        model_url = "https://drive.google.com/uc?id=1w9XhkAquwpZFCXu4Zr3GFzhBV0iHK7Jn&export=download"
+        gdown.download(model_url, model_file, quiet=False)
+    else:
+        print(f"Model {model_file} already exists, skipping download.")
+
+
 def transcribe_audio(file_path, model_name="medium"):
     """Transcribes the given audio file and returns the transcribed text using OpenAI Whisper."""
     try:
-        # Since the model is in the current directory, no need to specify a separate models folder
-        model_path = f"{model_name}.pt"
-
+        # Ensure the model is downloaded before trying to load it
+        download_model(model_name)
+        
         # Load the Whisper model from the current directory
-        model = whisper.load_model(model_path)
+        model = whisper.load_model(f"{model_name}.pt")
         
         # Transcribe audio using Whisper
         result = model.transcribe(file_path, language='ar')
@@ -133,6 +157,7 @@ def transcribe_audio(file_path, model_name="medium"):
         return result['text'].strip()  # Return the transcribed text
     except Exception as e:
         return f"حدث خطأ: {str(e)}"
+
 
 def compare_texts(reference, transcription):
     """Compares reference text with transcription and returns colored HTML."""
