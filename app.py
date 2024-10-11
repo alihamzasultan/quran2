@@ -127,31 +127,22 @@ import os
 
 
 
-def download_model(model_name="medium"):
-    """Downloads the Whisper model if it's not already present."""
-    model_path = f"{model_name}.pt"
-    
-    if not os.path.exists(model_path):
-        st.write(f"Downloading Whisper model '{model_name}'... This may take a few minutes.")
-        model = whisper.load_model(model_name)  # Whisper will automatically download the model
-        st.write("Model download complete!")
-        return model
-    else:
-        st.write(f"Using locally stored model '{model_name}'.")
-        return whisper.load_model(model_name)
-
 def transcribe_audio(file_path, model_name="medium"):
     """Transcribes the given audio file and returns the transcribed text using OpenAI Whisper."""
     try:
-        # Download or load the model
-        model = download_model(model_name)
+        # Since the model is in the current directory, no need to specify a separate models folder
+        model_path = f"{model_name}.pt"
+
+        # Load the Whisper model from the current directory
+        model = whisper.load_model(model_path)
         
-        # Transcribe the audio file
+        # Transcribe audio using Whisper
         result = model.transcribe(file_path, language='ar')
 
         return result['text'].strip()  # Return the transcribed text
     except Exception as e:
         return f"حدث خطأ: {str(e)}"
+
 
 def compare_texts(reference, transcription):
     """Compares reference text with transcription and returns colored HTML."""
@@ -249,6 +240,15 @@ def highlight_correction(reference, transcription):
 
     return " ".join(highlighted_output)
 
+
+from sklearn.feature_extraction.text import CountVectorizer
+from sklearn.metrics import jaccard_score
+import numpy as np
+
+def jaccard_similarity(reference, transcription):
+    vectorizer = CountVectorizer().fit_transform([reference, transcription])
+    vectors = vectorizer.toarray()
+    return jaccard_score(vectors[0], vectors[1])
 
 
 
