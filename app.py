@@ -126,38 +126,32 @@ import whisper
 import os
 
 
-import os
-import gdown
 
 def download_model(model_name="medium"):
-    """Download the Whisper model from Google Drive if it's not already downloaded."""
-    model_file = f"{model_name}.pt"
+    """Downloads the Whisper model if it's not already present."""
+    model_path = f"{model_name}.pt"
     
-    # Check if the model file already exists
-    if not os.path.exists(model_file):
-        print("Downloading the model...")
-        model_url = "https://drive.google.com/uc?id=1w9XhkAquwpZFCXu4Zr3GFzhBV0iHK7Jn&export=download"
-        gdown.download(model_url, model_file, quiet=False)
+    if not os.path.exists(model_path):
+        st.write(f"Downloading Whisper model '{model_name}'... This may take a few minutes.")
+        model = whisper.load_model(model_name)  # Whisper will automatically download the model
+        st.write("Model download complete!")
+        return model
     else:
-        print(f"Model {model_file} already exists, skipping download.")
-
+        st.write(f"Using locally stored model '{model_name}'.")
+        return whisper.load_model(model_name)
 
 def transcribe_audio(file_path, model_name="medium"):
     """Transcribes the given audio file and returns the transcribed text using OpenAI Whisper."""
     try:
-        # Ensure the model is downloaded before trying to load it
-        download_model(model_name)
+        # Download or load the model
+        model = download_model(model_name)
         
-        # Load the Whisper model from the current directory
-        model = whisper.load_model(f"{model_name}.pt")
-        
-        # Transcribe audio using Whisper
+        # Transcribe the audio file
         result = model.transcribe(file_path, language='ar')
 
         return result['text'].strip()  # Return the transcribed text
     except Exception as e:
         return f"حدث خطأ: {str(e)}"
-
 
 def compare_texts(reference, transcription):
     """Compares reference text with transcription and returns colored HTML."""
@@ -256,7 +250,14 @@ def highlight_correction(reference, transcription):
     return " ".join(highlighted_output)
 
 
+from sklearn.feature_extraction.text import CountVectorizer
+from sklearn.metrics import jaccard_score
+import numpy as np
 
+def jaccard_similarity(reference, transcription):
+    vectorizer = CountVectorizer().fit_transform([reference, transcription])
+    vectors = vectorizer.toarray()
+    return jaccard_score(vectors[0], vectors[1])
 
 
 
