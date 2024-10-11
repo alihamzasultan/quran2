@@ -241,15 +241,6 @@ def highlight_correction(reference, transcription):
     return " ".join(highlighted_output)
 
 
-from sklearn.feature_extraction.text import CountVectorizer
-from sklearn.metrics import jaccard_score
-import numpy as np
-
-def jaccard_similarity(reference, transcription):
-    vectorizer = CountVectorizer().fit_transform([reference, transcription])
-    vectors = vectorizer.toarray()
-    return jaccard_score(vectors[0], vectors[1])
-
 
 
 def main():
